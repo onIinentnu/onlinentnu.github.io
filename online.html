@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Popup With Blur (fixed-friendly)</title>
+<style>
+  body { margin: 0; padding: 0; overflow-x: hidden; }
+
+  /* Background image area (scrolls) */
+  .background-container {
+    position: relative;
+    width: 100%;
+    transition: filter 0.3s ease;
+  }
+  .background { display: block; width: 100%; height: auto; }
+
+  /* Sticky overlay (fixed) */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 93%;
+    z-index: 10;
+    transition: filter 0.3s ease;
+  }
+
+  /* Blur class applied to each target individually */
+  .blurred { filter: blur(8px); }
+
+  /* Popup */
+  .pop-up {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    z-index: 20;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+  }
+  .pop-up.visible {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+  }
+
+  /* Invisible hotspot button that scales with image */
+  .popup-button {
+    position: absolute;
+    top: 50.5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    aspect-ratio: 5 / 1;
+    background: transparent;
+    border: none;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 5;
+  }
+</style>
+</head>
+<body>
+
+  <div class="background-container" id="bg">
+    <img class="background" src="site.jpg" alt="Background">
+    <button id="popupButton" class="popup-button" onclick="showPopup()">Show Ticket</button>
+  </div>
+
+  <!-- Sticky overlay (will blur too) -->
+  <img class="overlay" id="sticky" src="sticky.png" alt="Overlay">
+
+  <!-- Popup (stays sharp) -->
+  <img id="popup" class="pop-up" src="ticket.png" alt="Pop-Up">
+
+<script>
+  const popup = document.getElementById('popup');
+  const button = document.getElementById('popupButton');
+  const bg = document.getElementById('bg');
+  const sticky = document.getElementById('sticky');
+
+  function showPopup() {
+    popup.classList.add('visible');
+    // Blur each target directly (no filtered ancestor!)
+    bg.classList.add('blurred');
+    sticky.classList.add('blurred');
+  }
+
+  // Click outside to close
+  document.addEventListener('click', (e) => {
+    if (
+      popup.classList.contains('visible') &&
+      !popup.contains(e.target) &&
+      !button.contains(e.target)
+    ) {
+      popup.classList.remove('visible');
+      bg.classList.remove('blurred');
+      sticky.classList.remove('blurred');
+    }
+  });
+</script>
+</body>
+</html>
